@@ -46,7 +46,7 @@ resource "aws_security_group" "node" {
     description     = "Allow control plane to access worker kubelet"
   }
 
-  
+
 
   ingress {
     from_port       = 443
@@ -66,7 +66,7 @@ resource "aws_security_group" "node" {
   }
 
   tags = {
-    Name                                = "gitops-estate-node-sg"
+    Name                                          = "gitops-estate-node-sg"
     "kubernetes.io/cluster/gitops-estate-cluster" = "owned"
   }
 }

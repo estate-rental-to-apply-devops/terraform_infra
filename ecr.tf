@@ -41,9 +41,9 @@ resource "aws_ecr_lifecycle_policy" "cleanup" {
         rulePriority = 1
         description  = "Keep only the last 5 tagged images"
         selection = {
-          tagStatus     = "any"
-          countType     = "imageCountMoreThan"
-          countNumber   = 5
+          tagStatus   = "any"
+          countType   = "imageCountMoreThan"
+          countNumber = 5
         }
         action = {
           type = "expire"

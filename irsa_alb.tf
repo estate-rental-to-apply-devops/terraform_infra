@@ -11,7 +11,7 @@ resource "aws_iam_policy" "alb_controller" {
 
 
 # 2. Extract OIDC provider details for the Trust Policy
-locals  {
+locals {
   oidc_issuer_clean = replace(aws_iam_openid_connect_provider.eks.url, "https://", "")
 }
 
