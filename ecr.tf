@@ -20,7 +20,7 @@ resource "aws_ecr_repository" "services" {
   name                 = "gitops-estate/${each.value}"
   image_tag_mutability = "MUTABLE" # Allows updating tags like :latest during development
   force_delete         = true
-  
+
   # Best Practice: Enable security vulnerability scanning on every push
   image_scanning_configuration {
     scan_on_push = true
@@ -39,7 +39,7 @@ resource "aws_ecr_lifecycle_policy" "cleanup" {
   policy = jsonencode({
     rules = [
       {
-        rulePriority = 2
+        rulePriority = 1
         description  = "Delete untagged images older than 1 day"
         selection = {
           tagStatus   = "untagged"

@@ -2,7 +2,7 @@
 # IRSA for RDS Secrets Manager Access
 # ==========================================
 
-# 1. IAM Policy allowing read access to the MySQL database secret
+# IAM Policy allowing read access to the MySQL database secret
 resource "aws_iam_policy" "rds_secret_accessor" {
   name        = "GitOpsEstateRDSSecretAccessor"
   description = "Allows reading the MySQL credentials secret from AWS Secrets Manager"
@@ -11,8 +11,8 @@ resource "aws_iam_policy" "rds_secret_accessor" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect   = "Allow"
-        Action   = [
+        Effect = "Allow"
+        Action = [
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret"
         ]
@@ -22,12 +22,7 @@ resource "aws_iam_policy" "rds_secret_accessor" {
   })
 }
 
-# 2. Extract clean OIDC issuer (reusing your existing pattern from irsa_alb.tf)
-locals {
-  oidc_issuer_clean_rds = replace(aws_iam_openid_connect_provider.eks.url, "https://", "")
-}
-
-# 3. IAM Role with OIDC Trust Relationship for Kubernetes Service Account
+# IAM Role with OIDC Trust Relationship — bound to the app's Kubernetes ServiceAccount
 resource "aws_iam_role" "rds_secret_accessor" {
   name = "gitops-estate-rds-secret-accessor-role"
 
@@ -37,14 +32,14 @@ resource "aws_iam_role" "rds_secret_accessor" {
       {
         Effect = "Allow"
         Principal = {
-          Federated = aws_iam_openid_connect_provider.eks.arn
+          Federated = module.eks.oidc_provider_arn
         }
         Action = "sts:AssumeRoleWithWebIdentity"
         Condition = {
           StringEquals = {
-            "${local.oidc_issuer_clean_rds}:aud" = "sts.amazonaws.com"
-            # This binds the role specifically to a future Kubernetes service account in your app namespace
-            "${local.oidc_issuer_clean_rds}:sub" = "system:serviceaccount:default:gitops-app-sa"
+            "${module.eks.oidc_provider}:aud" = "sts.amazonaws.com"
+            # Binds this role specifically to the app's ServiceAccount in its namespace
+            "${module.eks.oidc_provider}:sub" = "system:serviceaccount:gitops-app-ns:gitops-app-sa"
           }
         }
       }
@@ -52,15 +47,11 @@ resource "aws_iam_role" "rds_secret_accessor" {
   })
 }
 
-# 4. Attach the Secrets Manager policy to the IRSA role
 resource "aws_iam_role_policy_attachment" "rds_secret_accessor" {
   role       = aws_iam_role.rds_secret_accessor.name
   policy_arn = aws_iam_policy.rds_secret_accessor.arn
 }
 
-# ==========================================
-# Output for Kubernetes Manifests
-# ==========================================
 output "rds_secret_accessor_role_arn" {
   description = "IAM Role ARN for your Kubernetes Service Account to fetch DB credentials"
   value       = aws_iam_role.rds_secret_accessor.arn

@@ -6,6 +6,16 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    # Required by the terraform-aws-modules/eks module for OIDC certificate thumbprint
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
+    }
+    # Required by rds.tf for random_password
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
   }
 
   backend "s3" {

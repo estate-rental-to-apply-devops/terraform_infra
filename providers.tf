@@ -8,3 +8,6 @@ provider "aws" {
     }
   }
 }
+
+# Required by the terraform-aws-modules/eks module for OIDC certificate thumbprint
+provider "tls" {}

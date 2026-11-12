@@ -1,13 +1,6 @@
-# ==========================================
-# EKS OIDC Provider for IRSA
-# ==========================================
-
-data "tls_certificate" "cluster" {
-  url = aws_eks_cluster.main.identity[0].oidc[0].issuer
-}
-
-resource "aws_iam_openid_connect_provider" "eks" {
-  client_id_list  = ["sts.amazonaws.com"]
-  thumbprint_list = [data.tls_certificate.cluster.certificates[0].sha1_fingerprint]
-  url             = aws_eks_cluster.main.identity[0].oidc[0].issuer
-}
+# The OIDC provider for IRSA is now managed by
+# the terraform-aws-modules/eks/aws module (enable_irsa = true) in eks.tf.
+#
+# Useful module outputs for other files:
+#   module.eks.oidc_provider_arn  → the full ARN of the OIDC provider
+#   module.eks.oidc_provider      → the issuer URL without "https://"
