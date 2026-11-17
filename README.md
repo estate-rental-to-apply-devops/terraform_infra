@@ -6,6 +6,10 @@ Automated, production-grade Infrastructure as Code (IaC) provisioning the comple
 
 ## 🏛 AWS Infrastructure Architecture
 
+![AWS EKS ```mermaid VPC Infrastructure Architecture](assets/aws_vpc_architecture.png)
+
+<details><summary>Click to view Mermaid Diagram</summary>
+
 ```mermaid
 graph TB
     subgraph VPC["VPC (10.0.0.0/16) - eu-west-1"]
@@ -39,6 +43,8 @@ graph TB
     ECR["Amazon ECR (7 Repositories)"] -.->|Image Pull| EKSNode1
     SM["AWS Secrets Manager (DB Master Pass)"] -.->|IRSA CSI Secrets Driver| EKSNode1
     IAM_ALB["IAM Role (IRSA ALB Controller)"] -.->|ALB Ingress Management| ALB1
+
+</details>
 ```
 
 ---
